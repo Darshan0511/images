@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Image Links</title>
+  <title>Image Links with Copy Button</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
+      max-width: 800px;
+      margin: auto;
     }
     table {
       border-collapse: collapse;
@@ -19,31 +21,39 @@
     th {
       background-color: #f2f2f2;
     }
-    a {
-      color: #0066cc;
-      text-decoration: none;
+    button {
+      padding: 5px 10px;
+      cursor: pointer;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      border-radius: 4px;
+    }
+    button:active {
+      background-color: #0056b3;
     }
   </style>
 </head>
 <body>
-  <h1>📄 Public Image Links</h1>
+  <h1>Image Links with Copy Button</h1>
   <table>
     <thead>
       <tr>
         <th>Sl No.</th>
         <th>Filename</th>
         <th>URL</th>
+        <th>Copy</th>
       </tr>
     </thead>
     <tbody id="imageTable">
-      <tr><td colspan="3">Loading...</td></tr>
+      <tr><td colspan="4">Loading...</td></tr>
     </tbody>
   </table>
 
   <script>
     const username = "darshan0511";
     const repo = "images";
-    const folderPath = ""; // root
+    const folderPath = ""; // root folder
 
     async function fetchImages() {
       const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${folderPath}`;
@@ -64,16 +74,24 @@
           const nameCell = document.createElement("td");
           nameCell.textContent = file.name;
 
-          const linkCell = document.createElement("td");
-          const link = document.createElement("a");
-          link.href = file.download_url;
-          link.textContent = file.download_url;
-          link.target = "_blank";
-          linkCell.appendChild(link);
+          const urlCell = document.createElement("td");
+          urlCell.textContent = file.download_url;
+
+          const copyCell = document.createElement("td");
+          const copyBtn = document.createElement("button");
+          copyBtn.textContent = "Copy Link";
+          copyBtn.onclick = () => {
+            navigator.clipboard.writeText(file.download_url).then(() => {
+              copyBtn.textContent = "Copied!";
+              setTimeout(() => copyBtn.textContent = "Copy Link", 1500);
+            }).catch(() => alert("Failed to copy!"));
+          };
+          copyCell.appendChild(copyBtn);
 
           row.appendChild(idCell);
           row.appendChild(nameCell);
-          row.appendChild(linkCell);
+          row.appendChild(urlCell);
+          row.appendChild(copyCell);
           table.appendChild(row);
         }
       });
