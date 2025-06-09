@@ -1,75 +1,82 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Dynamic Image Gallery</title>
+  <title>Image Links</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
-      background: #f9f9f9;
     }
-    h1 {
-      color: #333;
+    table {
+      border-collapse: collapse;
+      width: 100%;
     }
-    .image {
-      margin-bottom: 25px;
+    th, td {
+      text-align: left;
+      padding: 8px;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background-color: #f2f2f2;
     }
     a {
       color: #0066cc;
       text-decoration: none;
     }
-    img {
-      max-width: 300px;
-      display: block;
-      margin-top: 8px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      background: white;
-      padding: 4px;
-    }
   </style>
 </head>
 <body>
-  <h1>📷 Public Image Gallery</h1>
-  <div id="gallery">Loading images...</div>
+  <h1>📄 Public Image Links</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Sl No.</th>
+        <th>Filename</th>
+        <th>URL</th>
+      </tr>
+    </thead>
+    <tbody id="imageTable">
+      <tr><td colspan="3">Loading...</td></tr>
+    </tbody>
+  </table>
 
   <script>
     const username = "darshan0511";
     const repo = "images";
-    const folderPath = ""; // Root folder of the repo
+    const folderPath = ""; // root
 
     async function fetchImages() {
       const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${folderPath}`;
-      try {
-        const response = await fetch(apiUrl);
-        const files = await response.json();
+      const res = await fetch(apiUrl);
+      const files = await res.json();
 
-        const gallery = document.getElementById("gallery");
-        gallery.innerHTML = "";
+      const table = document.getElementById("imageTable");
+      table.innerHTML = "";
 
-        files.forEach(file => {
-          if (file.type === "file" && /\.(jpg|jpeg|png|gif|webp)$/i.test(file.name)) {
-            const div = document.createElement("div");
-            div.className = "image";
+      let count = 1;
+      files.forEach(file => {
+        if (file.type === "file" && /\.(jpg|jpeg|png|gif|webp)$/i.test(file.name)) {
+          const row = document.createElement("tr");
 
-            const link = document.createElement("a");
-            link.href = file.download_url;
-            link.target = "_blank";
-            link.textContent = file.name;
+          const idCell = document.createElement("td");
+          idCell.textContent = count++;
 
-            const img = document.createElement("img");
-            img.src = file.download_url;
-            img.alt = file.name;
+          const nameCell = document.createElement("td");
+          nameCell.textContent = file.name;
 
-            div.appendChild(link);
-            div.appendChild(img);
-            gallery.appendChild(div);
-          }
-        });
-      } catch (err) {
-        document.getElementById("gallery").textContent = "Failed to load images.";
-        console.error(err);
-      }
+          const linkCell = document.createElement("td");
+          const link = document.createElement("a");
+          link.href = file.download_url;
+          link.textContent = file.download_url;
+          link.target = "_blank";
+          linkCell.appendChild(link);
+
+          row.appendChild(idCell);
+          row.appendChild(nameCell);
+          row.appendChild(linkCell);
+          table.appendChild(row);
+        }
+      });
     }
 
     fetchImages();
